@@ -1,3 +1,3 @@
-enum class Statemets(operator:String) {
+enum class Statemets(val operator:String) {
     RETURN("return")
 }
