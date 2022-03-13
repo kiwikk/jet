@@ -1,6 +1,6 @@
 # JET 
 Jump Elimination Tool
-## How for?
+## What for?
 Many programs include some number of goto statements. This leads to an unstructured code, that is difficult
 to understand and optimize. A method of elimination goto
 statements is proposed.
