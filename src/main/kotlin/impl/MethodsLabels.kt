@@ -12,7 +12,8 @@ object MethodsLabels {
 
         codeLines.forEachIndexed { index, s ->
             //аргументы метода могут быть указаны в несколько строк
-            //отличать методы и их вызовы
+            //как отличать методы и их вызовы (где-то рядом с методом обычно всегда водится возвращаемый тип)
+            //for() и прочие ребята задетектятся, надо смотреть, чтобы не было совпадений с кейвордами
             if (methodPattern.containsMatchIn(s)) {
                 val nameFromPattern = nameMethodPattern.find(s)?.value
                 if (!nameFromPattern.isNullOrEmpty()) {
