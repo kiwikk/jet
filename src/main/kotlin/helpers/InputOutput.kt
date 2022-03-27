@@ -9,4 +9,8 @@ object InputOutput {
     fun printList(list: List<Any>) = list.forEach {
         println(it)
     }
+
+    fun printMap(map: HashMap<String, Int>) = map.forEach { (t, u) -> println("[$t -- $u]") }
+
+    fun printDivider() = println("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ")
 }
