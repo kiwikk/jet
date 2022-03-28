@@ -36,7 +36,35 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
             map[invokedMethod] = newCodeLines
         }
 
+        val mergedList = merge(map)
+        InputOutput.printDivider()
+        InputOutput.printList(mergedList)
         return map
+    }
+
+    private fun merge(map: Map<String, List<String>>): List<String> {
+        val res = mutableListOf<String>()
+
+        run loop@{
+            codelines.forEachIndexed { index, s ->
+                if (s.contains("}")) {
+                    res.add(s)
+                    res.add("}")
+                    return@loop
+                }
+                var added = false
+                map.forEach {
+                    var tmpStr = mutableListOf<String>()
+                    if (s.contains(it.key)) {
+                        tmpStr = it.value.toMutableList()
+                        res.addAll(tmpStr)
+                        added = true
+                    }
+                }
+                if (!added) res.add(s)
+            }
+        }
+        return res
     }
 
     private fun getTransformedMethod(
@@ -50,7 +78,7 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
         var i = start
         while (!codelines[i].contains("}")) {
             if (i <= statementInvokedStart - 1 || i > statementInvokedStart) {
-                res.add(codelines[i])
+                //res.add(codelines[i])
             } else {
                 res.addAll(transformedMethodBody)
             }
@@ -60,7 +88,7 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
             }
             i += transformedMethodBody.size
         }
-        res.add(codelines[i])
+        //res.add(codelines[i])
 
         return res
     }

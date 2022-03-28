@@ -15,7 +15,7 @@ fun main() {
      * .cpp
      * etc
      * */
-    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test.kt"
+    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test1.kt"
     val list = readFileAsLines(fileName)
     printList(list)
 

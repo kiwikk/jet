@@ -1,6 +1,7 @@
 package impl
 
 import Method
+import MethodBody
 import OperatorState
 import helpers.InputOutput.printDivider
 import helpers.InputOutput.printList
@@ -9,7 +10,6 @@ import helpers.Statements
 
 class JumpState(val codeLines: List<String>) {
     private val gotoList = getGotoList(codeLines)
-    private val inputPoints = ArrayDeque<Int>()
     private val methodPattern = "\\s\\w*\\(.*[^{]\$".toRegex()
     private val classPattern = "\\w*\\bclass\\s\\w*".toRegex()
     private val methodsDeclarations = MethodsLabels.getMethodsDeclarations(codeLines)
@@ -27,9 +27,11 @@ class JumpState(val codeLines: List<String>) {
     fun getGotoLabelList(statement: Statements) : List<OperatorState> {
         var nesting = 0
         var i = -1
-       // val enterPointStack = ArrayDeque<Int>()
+        val enterPointStack = ArrayDeque<Int>()
         var currentClassName = ""
         val methodStack = ArrayDeque<Method>()
+        val inputPoints = ArrayDeque<Int>()
+
         //var currentMethod = Method("VabbaLubbaDubDub", -1)
        // val enterList = mutableListOf<Int>()
         val operatorStatesList = mutableListOf<OperatorState>()
@@ -40,17 +42,20 @@ class JumpState(val codeLines: List<String>) {
                 if (!classNameFromPattern.isNullOrEmpty())
                     currentClassName = classNameFromPattern.split(" ")[1]
             }
-            if (codeLines[i].contains('{')) {
-               // enterPointStack.add(i)
-                nesting++
-            }
             if(RegexHelper.containMethodDeclaration(codeLines[i])){
                 methodStack.add(Method(RegexHelper.getMetodName(codeLines[i]) ?: continue, i))
+            }
+            if (codeLines[i].contains('{')) {
+                //enterPointStack.add(methodStack.last().invokationLine)
+               // nesting++
             }
             if (methodPattern.containsMatchIn(codeLines[i])) {
                 inputPoints.add(i)
                 val methodName = RegexHelper.getMetodName(codeLines[i]) ?: continue
                 val methodLine = methodsDeclarations[methodName] ?: continue
+
+                enterPointStack.add(i)
+
                 //входим в метод (котлиновские методы могут быть записаны в одну строку)
                 i = methodLine - 1
                 // добавляем строку входа и вложенность на которой она находится, чтобы потом по ней разворачивать ретёрн
@@ -68,7 +73,7 @@ class JumpState(val codeLines: List<String>) {
                 )
             }
             if (codeLines[i].contains('}')) {
-               // i = enterPointStack.removeLast()
+               i = enterPointStack.removeLastOrNull() ?: break
             }
         }
 
@@ -87,6 +92,4 @@ class JumpState(val codeLines: List<String>) {
         printList(statements)
         return statements
     }
-
-
 }
