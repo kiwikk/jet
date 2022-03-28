@@ -4,6 +4,9 @@ import helpers.InputOutput.readFileAsLines
 import helpers.Statements
 import impl.JumpState
 import impl.JumpTransformation
+import java.sql.Time
+import java.time.LocalDateTime
+import kotlin.system.measureTimeMillis
 
 fun main() {
     /**
@@ -19,15 +22,14 @@ fun main() {
     val list = readFileAsLines(fileName)
     printList(list)
 
-//    val a = MethodsLabels.getMethodsDeclarations(list)
-//    val b = MethodsLabels.getMethodsCalls(list)
+    val executionTime = measureTimeMillis {
+        val jumpStates = JumpState(list)
+        val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
 
-    val jumpStates = JumpState(list)
-    val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
+        val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
+        jumpTransformation.getTransformedCode()
+    }
 
-    val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
-    jumpTransformation.getTransformedCode()
-
-    printDivider()
-    printList(gotoList)
+    println()
+    print("Execution time: $executionTime ms.")
 }
