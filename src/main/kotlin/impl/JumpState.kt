@@ -29,7 +29,8 @@ class JumpState(val codeLines: List<String>) {
         var i = -1
        // val enterPointStack = ArrayDeque<Int>()
         var currentClassName = ""
-        var currentMethod = Method("VabbaLubbaDubDub", -1)
+        val methodStack = ArrayDeque<Method>()
+        //var currentMethod = Method("VabbaLubbaDubDub", -1)
        // val enterList = mutableListOf<Int>()
         val operatorStatesList = mutableListOf<OperatorState>()
         while (i < codeLines.size-1) {
@@ -43,21 +44,25 @@ class JumpState(val codeLines: List<String>) {
                // enterPointStack.add(i)
                 nesting++
             }
+            if(RegexHelper.containMethodDeclaration(codeLines[i])){
+                methodStack.add(Method(RegexHelper.getMetodName(codeLines[i]) ?: continue, i))
+            }
             if (methodPattern.containsMatchIn(codeLines[i])) {
                 inputPoints.add(i)
-                currentMethod = Method(RegexHelper.getMetodName(codeLines[i]) ?: continue, i)
-                val methodLine = methodsDeclarations[currentMethod.methodName] ?: continue
+                val methodName = RegexHelper.getMetodName(codeLines[i]) ?: continue
+                val methodLine = methodsDeclarations[methodName] ?: continue
                 //входим в метод (котлиновские методы могут быть записаны в одну строку)
                 i = methodLine - 1
                 // добавляем строку входа и вложенность на которой она находится, чтобы потом по ней разворачивать ретёрн
                 // надо ли тогда запоминать на какой строке лежит ретёрн? скорее да чем нет
             }
             if (codeLines[i].contains(statement.operator)) {
+                methodStack.removeLast()
                 operatorStatesList.add(
                     OperatorState(
                         className = currentClassName,
                         inputLine = inputPoints.removeLast(),
-                        callingMethod = currentMethod,
+                        callingMethod = methodStack.last(),
                         operator = statement
                     )
                 )

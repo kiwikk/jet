@@ -39,6 +39,10 @@ object RegexHelper {
         return args
     }
 
+    fun containMethodDeclaration(s: String): Boolean {
+        return declarationMethodPattern.containsMatchIn(s)
+    }
+
     fun getMethodArgumentsFromKotlin(s: String): List<String> {
         val argsFromPattern = methodArgumentsPattern.find(s)?.let {
             val value = it.value

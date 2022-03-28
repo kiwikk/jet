@@ -22,7 +22,13 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
             //вабба лабба даб даб
             //копируем весь метод в котором находимся до входа в нужный нам, вставляем нашу магию и копируем всё, что после
             val newCodeLines =
-                getTransformedMethod(statement.callingMethod.invokationLine, statement.inputLine, transformations)
+                getTransformedMethod(
+                    statement.callingMethod.invokationLine,
+                    statement.inputLine,
+                    transformations,
+                    methodBody.returnValue!!,
+                    invokedMethod
+                )
 
             InputOutput.printDivider()
             InputOutput.printList(newCodeLines)
@@ -36,18 +42,25 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
     private fun getTransformedMethod(
         start: Int,
         statementInvokedStart: Int,
-        transformedMethodBody: List<String>
+        transformedMethodBody: List<String>,
+        methodReturnedValue: String,
+        invokedMethodName: String
     ): List<String> {
         val res = mutableListOf<String>()
-        var i = start - 1
-        do {
-            if (i < statementInvokedStart - 1 || i > statementInvokedStart) {
+        var i = start
+        while (!codelines[i].contains("}")) {
+            if (i <= statementInvokedStart - 1 || i > statementInvokedStart) {
                 res.add(codelines[i])
             } else {
                 res.addAll(transformedMethodBody)
             }
-            i+=transformedMethodBody.size
-        } while (!codelines[i].contains("}"))
+            if (codelines[i].contains("=") && codelines[i].contains(invokedMethodName)) {
+                val tmp = codelines[i].split("=")[0] + " = $methodReturnedValue"
+                res.add(tmp)
+            }
+            i += transformedMethodBody.size
+        }
+        res.add(codelines[i])
 
         return res
     }
@@ -86,9 +99,10 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
         val body = mutableListOf<String>()
         var i = methodDeclarations[methodEntry] ?: throw NoSuchMethodException()
 
+        i++
         while (!codelines[i].contains(statement.operator)) {
-            i++
             body.add(codelines[i])
+            i++
         }
 
         val returnValue = codelines[i].split(statement.operator)[1]
