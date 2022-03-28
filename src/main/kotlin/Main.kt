@@ -1,3 +1,32 @@
-fun main() {
+import helpers.InputOutput.printList
+import helpers.InputOutput.readFileAsLines
+import helpers.Statements
+import impl.JumpState
+import impl.JumpTransformation
+import kotlin.system.measureTimeMillis
 
+fun main() {
+    /**
+     * берём имя файла
+     * сплитим по точке
+     * смотрим формат файла после точки -- определяем язык
+     * .py
+     * .kt
+     * .cpp
+     * etc
+     * */
+    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test1.kt"
+    val list = readFileAsLines(fileName)
+    printList(list)
+
+    val executionTime = measureTimeMillis {
+        val jumpStates = JumpState(list)
+        val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
+
+        val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
+        jumpTransformation.getTransformedCode()
+    }
+
+    println()
+    print("Execution time: $executionTime ms.")
 }
