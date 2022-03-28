@@ -17,14 +17,18 @@ object RegexHelper {
     }
 
     fun getMethodArgumentsNamesFromKotlin(s: String): List<String> {
-        val argsFromPattern = methodArgumentsPattern.find(s)?.value?.apply {
-            substring(1, length - 2)
+        val argsFromPattern = methodArgumentsPattern.find(s)?.let {
+            val value = it.value
+            value.substring(1, value.length - 1)
         }?.split(",")
 
         val args = mutableListOf<String>()
         if (argsFromPattern != null) {
             for (arg in argsFromPattern) {
-                args.add(arg.split(":")[0])
+                val tmp = arg.let {
+                    it.split(":")[0]
+                }.filter { !it.isWhitespace() }
+                args.add(tmp)
             }
         }
 
@@ -36,14 +40,15 @@ object RegexHelper {
     }
 
     fun getMethodArgumentsFromKotlin(s: String): List<String> {
-        val argsFromPattern = methodArgumentsPattern.find(s)?.value?.apply {
-            substring(1, length - 2)
+        val argsFromPattern = methodArgumentsPattern.find(s)?.let {
+            val value = it.value
+            value.substring(1, value.length - 1)
         }?.split(",")
 
         val args = mutableListOf<String>()
         if (argsFromPattern != null) {
             for (arg in argsFromPattern) {
-                args.add(arg)
+                args.add(arg.filter { !it.isWhitespace() })
             }
         }
 

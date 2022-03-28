@@ -46,7 +46,7 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
             } else {
                 res.addAll(transformedMethodBody)
             }
-            i++
+            i+=transformedMethodBody.size
         } while (!codelines[i].contains("}"))
 
         return res
@@ -57,16 +57,17 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
         methodBody: MethodBody
     ): List<String> {
         val result = mutableListOf<String>()
-        methodBody.body.forEach { it ->
-            methodArguments.forEach { itM ->
-                if (it.contains(itM.key)) {
-                    val newStr = it.replace(itM.key, itM.value)
-                    result.add(newStr)
-                } else {
-                    result.add(it)
+
+        methodBody.body.forEachIndexed { index, s ->
+            var tmpStr = s
+            methodArguments.forEach {
+                if (tmpStr.contains(it.key)) {
+                    tmpStr = tmpStr.replace(it.key, it.value)
                 }
             }
+            result.add(index, tmpStr)
         }
+
         return result
     }
 
