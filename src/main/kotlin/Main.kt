@@ -1,11 +1,8 @@
-import helpers.InputOutput.printDivider
 import helpers.InputOutput.printList
 import helpers.InputOutput.readFileAsLines
 import helpers.Statements
 import impl.JumpState
 import impl.JumpTransformation
-import java.sql.Time
-import java.time.LocalDateTime
 import kotlin.system.measureTimeMillis
 
 fun main() {
@@ -18,7 +15,7 @@ fun main() {
      * .cpp
      * etc
      * */
-    val fileName = "C:\\Users\\Mi\\Desktop\\Test.kt"
+    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test.kt"
     val list = readFileAsLines(fileName)
     printList(list)
 
