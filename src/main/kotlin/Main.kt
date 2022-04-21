@@ -1,8 +1,9 @@
 import helpers.InputOutput.printList
 import helpers.InputOutput.readFileAsLines
+import helpers.MethodsLabels
 import helpers.Statements
-import impl.JumpState
-import impl.JumpTransformation
+import oldimpl.JumpState
+import oldimpl.JumpTransformation
 import kotlin.system.measureTimeMillis
 
 fun main() {
@@ -15,18 +16,20 @@ fun main() {
      * .cpp
      * etc
      * */
-    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test1.kt"
+    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test3.kt"
     val list = readFileAsLines(fileName)
     printList(list)
 
-    val executionTime = measureTimeMillis {
-        val jumpStates = JumpState(list)
-        val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
+    val cl = MethodsLabels.getMethodsWithOperator(codeLines = list, "while")
 
-        val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
-        jumpTransformation.getTransformedCode()
-    }
-
-    println()
-    print("Execution time: $executionTime ms.")
+//    val executionTime = measureTimeMillis {
+//        val jumpStates = JumpState(list)
+//        val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
+//
+//        val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
+//        jumpTransformation.getTransformedCode()
+//    }
+//
+//    println()
+//    print("Execution time: $executionTime ms.")
 }

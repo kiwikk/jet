@@ -1,9 +1,11 @@
-package impl
+package helpers
 
 import helpers.InputOutput.printList
-import MethodLinePair
+import MethodOpenCloseBracket
 import helpers.InputOutput.printDivider
 import helpers.InputOutput.printMap
+import helpers.parsers.NestingHelpers
+import keywords.KeyWords
 
 object MethodsLabels {
     private val methodPattern = "\\s\\w*\\(.*[^{]\$".toRegex()
@@ -32,8 +34,50 @@ object MethodsLabels {
         return methodDeclaration
     }
 
-    fun getMethodsCalls(codeLines: List<String>): List<MethodLinePair> {
-        val methodCalls = mutableListOf<MethodLinePair>()
+    fun getMethodsDeclarationsList(codeLines: List<String>): List<MethodOpenCloseBracket> {
+        val methodDeclaration = mutableListOf<MethodOpenCloseBracket>()
+
+        var i = 0
+        while (i < codeLines.size) {
+            if (declarationMethodPattern.containsMatchIn(codeLines[i]) &&
+                KeyWords.KotlinKeyWords.all { !codeLines[i].contains(it) }
+            ) {
+                val nameFromPattern = nameMethodPattern.find(codeLines[i])?.value
+                if (!nameFromPattern.isNullOrEmpty()) {
+                    val name = nameFromPattern.subSequence(1, nameFromPattern.length - 1).toString()
+                    val endLine = NestingHelpers.getNesting(codeLines, i).last().closeNestingLine
+                    methodDeclaration.add(MethodOpenCloseBracket(name, i, endLine))
+                }
+            }
+            i++
+        }
+
+        printDivider()
+        println("Methods declarations:")
+        printList(methodDeclaration)
+        return methodDeclaration
+    }
+
+    fun getMethodsWithOperator(codeLines: List<String>, operator: String): List<MethodOpenCloseBracket> {
+        val methods = getMethodsDeclarationsList(codeLines)
+        val methodsWithOperators = mutableListOf<MethodOpenCloseBracket>()
+
+        for (method in methods) {
+            var i = method.startLine
+            while (i < method.endLine) {
+                if (codeLines[i].contains(operator)) {
+                    methodsWithOperators.add(method)
+                    break
+                }
+                i++
+            }
+        }
+
+        return methodsWithOperators
+    }
+
+    fun getMethodsCalls(codeLines: List<String>): List<MethodOpenCloseBracket> {
+        val methodCalls = mutableListOf<MethodOpenCloseBracket>()
 
         codeLines.forEachIndexed { index, s ->
             if (methodPattern.containsMatchIn(s)) {
@@ -41,9 +85,9 @@ object MethodsLabels {
                 if (!nameFromPattern.isNullOrEmpty()) {
                     val name = nameFromPattern.subSequence(1, nameFromPattern.length - 1).toString()
                     methodCalls.add(
-                        MethodLinePair(
+                        MethodOpenCloseBracket(
                             methodName = name,
-                            line = index
+                            startLine = index
                         )
                     )
                 }

@@ -1,5 +1,5 @@
 package keywords
 
 object KeyWords {
-    val KotlinKeyWords = mutableListOf("https://kotlinlang.org/docs/keyword-reference.html#hard-keywords")
+    val KotlinKeyWords = mutableListOf("while", "if", "for")
 }
