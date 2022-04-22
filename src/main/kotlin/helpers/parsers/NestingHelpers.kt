@@ -37,8 +37,9 @@ object NestingHelpers {
      *
      * @return nesting of input line
      * */
-    fun getNearestNestingBodyBracket(line: Int, openClosedNestingList: List<OpenClosedNesting>): OpenClosedNesting {
-        val tmp = openClosedNestingList.map { it to ((line - it.openNestingLine) + (it.closeNestingLine - line))/2 }
+    fun getMyNesting(line: Int, openClosedNestingList: List<OpenClosedNesting>): OpenClosedNesting {
+        val openBrackets = openClosedNestingList.filter { it.closeNestingLine > line }
+        val tmp = openBrackets.map { it to ((line - it.openNestingLine) + (it.closeNestingLine - line))/2 }
         val res = tmp.minByOrNull { it.second }
         return res!!.first
     }

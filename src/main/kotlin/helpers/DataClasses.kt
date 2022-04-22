@@ -1,7 +1,7 @@
 import helpers.Statements
 
 
-data class OperatorState(val className:String, val inputLine: Int, val callingMethod : Method, val operator: Statements)
+data class OperatorState(val className: String, val inputLine: Int, val callingMethod: Method, val operator: Statements)
 
 data class MethodBody(val body: List<String>, val returnValue: String?)
 
@@ -29,6 +29,12 @@ data class OpenClosedNesting(val nesting: Int, val openNestingLine: Int, val clo
  * @param startLine linked start line of the method to be linked
  * @param endLine linked end line of the method to be linked
  * */
-data class MethodOpenCloseBracket(val methodName: String, val startLine: Int, val endLine:Int = -1)
+data class MethodOpenCloseBracket(val methodName: String, val startLine: Int, val endLine: Int = -1)
+
+data class ContinueInMethod(val line: Int, val method: MethodOpenCloseBracket)
+
+data class ContinueTransformedStatement(val conditionBody: List<String>, val afterConditionBody: List<String>, val oldBodyEndLine: Int = -1)
+
+data class BodyLine(val line: Int, val body: List<String>)
 
 
