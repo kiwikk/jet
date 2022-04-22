@@ -61,13 +61,23 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
 
     private fun transform(startLine: Int, endLine: Int, codeLines: List<String>): List<String> {
         val body = getBody(startLine, endLine)
-        val eliminatableList = getOperatorList(startLine, endLine, codeLines)
+        val continueList = getOperatorList(startLine, endLine, codeLines)
+
+        val transformedBody = mutableMapOf<Int, String>()
+
+
+
+
 
 
         return body
     }
 
-    private fun getOperatorList(startLine: Int, endLine: Int, codeLines: List<String>): List<ContinueTransformedStatement> {
+    private fun getOperatorList(
+        startLine: Int,
+        endLine: Int,
+        codeLines: List<String>
+    ): List<ContinueTransformedStatement> {
         val lines = mutableListOf<ContinueTransformedStatement>()
         val nesting = NestingHelpers.getNesting(codeLines, startLine)
 
@@ -78,26 +88,28 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
                 var nearestNesting = NestingHelpers.getMyNesting(i, nesting)
                 var j = nearestNesting.openNestingLine
                 val conditionBody = mutableListOf<String>()
-                while (j <= nearestNesting.nesting) {
-                    if (codeLines[i].contains(operator)) {
+                while (j <= nearestNesting.closeNestingLine) {
+                    if (codeLines[j].contains(operator)) {
+                        j++
                         continue
                     }
                     conditionBody.add(codeLines[j])
                     j++
                 }
-                nearestNesting = NestingHelpers.getMyNesting(i, nesting)
+                nearestNesting = NestingHelpers.getMyNesting(j, nesting)
                 val body = mutableListOf<String>()
                 while (j < nearestNesting.closeNestingLine) {
-                    body.add(codeLines[i])
+                    body.add(codeLines[j])
                     j++
                 }
                 lines.add(
                     ContinueTransformedStatement(
                         conditionBody,
                         body,
-                        i + 1
+                        j - 1
                     )
                 )
+                i = j
             }
             i++
         }

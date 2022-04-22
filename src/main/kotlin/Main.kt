@@ -1,3 +1,4 @@
+import elimination.impl.ContinueElimination
 import helpers.InputOutput.printList
 import helpers.InputOutput.readFileAsLines
 import helpers.MethodsLabels
@@ -20,7 +21,8 @@ fun main() {
     val list = readFileAsLines(fileName)
     printList(list)
 
-    val cl = MethodsLabels.getMethodsWithOperator(codeLines = list, "while")
+    val cl = ContinueElimination(list, Statements.CONTINUE.operator)
+    cl.getTransformedCode()
 
 //    val executionTime = measureTimeMillis {
 //        val jumpStates = JumpState(list)
