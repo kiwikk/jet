@@ -37,9 +37,7 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
     }
 
     override fun getTransformedCode(): List<String> {
-        val methods = MethodsLabels.getMethodsWithOperator(codeLines, operator)
         var result = codeLines
-        // val transformedMethods = mutableMapOf<MethodOpenCloseBracket, List<String>>()
         val statementList = getEliminatable()
 
         for (c in statementList) {
@@ -134,43 +132,4 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
 
         return lines
     }
-
-    private fun getBody(startLine: Int, endLine: Int): List<String> {
-        val body = mutableListOf<String>()
-        var i = startLine
-        while (i < endLine) {
-            body.add(codeLines[i])
-            i++
-        }
-
-        return body
-    }
-
-    private fun wrapToIf(body: List<String>, condition: String): List<String> {
-        val wrappedBody = mutableListOf<String>()
-
-        return wrappedBody
-    }
-
-//    private fun getAfterOperatorBody(lineFrom: Int, lineTo: Int): List<String> {
-//        val body = mutableListOf<String>()
-//        var i = lineFrom
-//        while (i < lineTo) {
-//            body.add(codeLines[i])
-//            i++
-//        }
-//
-//        return body
-//    }
-//
-//    private fun getOperatorBody(line: Int): List<String> {
-//        val body = mutableListOf<String>()
-//        var i = line
-//        while (!codeLines[i].contains(operator)) {
-//            body.add(codeLines[i])
-//            i++
-//        }
-//
-//        return body
-//    }
 }
