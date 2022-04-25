@@ -27,7 +27,7 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
         val op = mutableListOf<ContinueInMethod>()
         var i = method.startLine
         while (i < method.endLine) {
-            if (codeLines[i].contains(operator)) {
+            if ("\\s[^\\w*]$operator".toRegex().containsMatchIn(codeLines[i])) {
                 op.add(ContinueInMethod(i, method))
             }
             i++
