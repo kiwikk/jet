@@ -5,6 +5,7 @@ import helpers.MethodsLabels
 import helpers.Statements
 import oldimpl.JumpState
 import oldimpl.JumpTransformation
+import java.io.File
 import kotlin.system.measureTimeMillis
 
 fun main() {
@@ -22,7 +23,14 @@ fun main() {
     printList(list)
 
     val cl = ContinueElimination(list, Statements.CONTINUE.operator)
-    cl.getTransformedCode()
+    val transformed = cl.getTransformedCode()
+
+    val outputFileName = "C:\\Users\\Mi\\Desktop\\tests\\output_Test3.kt"
+    File(outputFileName).printWriter().use { out ->
+        transformed.forEach {
+            out.println(it)
+        }
+    }
 
 //    val executionTime = measureTimeMillis {
 //        val jumpStates = JumpState(list)

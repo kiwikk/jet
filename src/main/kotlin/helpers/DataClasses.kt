@@ -33,7 +33,14 @@ data class MethodOpenCloseBracket(val methodName: String, val startLine: Int, va
 
 data class ContinueInMethod(val line: Int, val method: MethodOpenCloseBracket)
 
-data class ContinueTransformedStatement(val conditionBody: List<String>, val afterConditionBody: List<String>, val oldBodyEndLine: Int = -1)
+data class ContinueTransformedStatement(
+    val conditionBody: List<String>,
+    val afterConditionBody: List<String>,
+    val openBodyLine: Int,
+    val oldBodyEndLine: Int = -1
+)
+
+data class CodeToMerge(val from: Int, val to: Int, val body: List<String>)
 
 data class BodyLine(val line: Int, val body: List<String>)
 

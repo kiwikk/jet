@@ -1,5 +1,6 @@
 package elimination.impl
 
+import CodeToMerge
 import ContinueInMethod
 import ContinueTransformedStatement
 import MethodOpenCloseBracket
@@ -37,42 +38,58 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
 
     override fun getTransformedCode(): List<String> {
         val methods = MethodsLabels.getMethodsWithOperator(codeLines, operator)
-        val result = codeLines
+        var result = codeLines
         // val transformedMethods = mutableMapOf<MethodOpenCloseBracket, List<String>>()
         val statementList = getEliminatable()
 
         for (c in statementList) {
             //делаем один - мёрджим делаем один - мёрджим
             val transformation = transform(c.method.startLine, c.method.endLine, result)
+            result = merge(transformation, result)
         }
-
-//        for (method in methods) {
-//            transformedMethods[method] = transform(method.startLine, method.endLine)
-//        }
-//
-//        val result = merge(transformedMethods)
 
         return result
     }
 
-    private fun merge(map: Map<MethodOpenCloseBracket, List<String>>): List<String> {
-        return emptyList()
+    private fun merge(code: List<CodeToMerge>, lines: List<String>): List<String> {
+        val result = lines.toMutableList()
+
+        for (c in code) {
+            result.addAll(c.from, c.body)
+
+            val shift = (c.to - c.from)
+            var i = c.to + shift - 1
+            while (i >= c.from + shift) {
+                result.removeAt(i--)
+            }
+        }
+
+        return result
     }
 
-    private fun transform(startLine: Int, endLine: Int, codeLines: List<String>): List<String> {
-        val body = getBody(startLine, endLine)
+    private fun transform(startLine: Int, endLine: Int, codeLines: List<String>): List<CodeToMerge> {
         val continueList = getOperatorList(startLine, endLine, codeLines)
+        val transformedBody = mutableListOf<CodeToMerge>()
 
-        val transformedBody = mutableMapOf<Int, String>()
+        for (c in continueList) {
+            transformedBody.add(mergeBody(c))
+        }
 
-
-
-
-
-
-        return body
+        return transformedBody
     }
 
+    private fun mergeBody(statement: ContinueTransformedStatement): CodeToMerge {
+        val result = mutableListOf<String>()
+        result.addAll(statement.conditionBody)
+        val last = result.removeLast()
+        result.add("$last else {")
+        result.addAll(statement.afterConditionBody)
+        result.add(last)
+
+        return CodeToMerge(statement.openBodyLine, statement.oldBodyEndLine, result)
+    }
+
+    //todo rename
     private fun getOperatorList(
         startLine: Int,
         endLine: Int,
@@ -85,10 +102,10 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
         while (i < endLine) {
             if (codeLines[i].contains(operator)) {
                 //if может быть на несколько строк или { начинаться с новой строки
-                var nearestNesting = NestingHelpers.getMyNesting(i, nesting)
-                var j = nearestNesting.openNestingLine
+                val firstNesting = NestingHelpers.getMyNesting(i, nesting)
+                var j = firstNesting.openNestingLine
                 val conditionBody = mutableListOf<String>()
-                while (j <= nearestNesting.closeNestingLine) {
+                while (j <= firstNesting.closeNestingLine) {
                     if (codeLines[j].contains(operator)) {
                         j++
                         continue
@@ -96,9 +113,9 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
                     conditionBody.add(codeLines[j])
                     j++
                 }
-                nearestNesting = NestingHelpers.getMyNesting(j, nesting)
+                val secondNesting = NestingHelpers.getMyNesting(j, nesting)
                 val body = mutableListOf<String>()
-                while (j < nearestNesting.closeNestingLine) {
+                while (j < secondNesting.closeNestingLine) {
                     body.add(codeLines[j])
                     j++
                 }
@@ -106,7 +123,8 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
                     ContinueTransformedStatement(
                         conditionBody,
                         body,
-                        j - 1
+                        firstNesting.openNestingLine,
+                        j
                     )
                 )
                 i = j
