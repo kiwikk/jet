@@ -1,17 +1,17 @@
 package elimination.impl
 
+import BreakTransformedStatement
 import CodeToMerge
-import ContinueTransformedStatement
 import elimination.StatementToEliminate
+import helpers.RegexHelper
 import helpers.parsers.NestingHelpers
 
-class ContinueElimination(private val codeLines: List<String>, private val operator: String) :
+class BreakElimination(private val codeLines: List<String>, private val operator: String) :
     StatementToEliminate(operator) {
     var statementList = getEliminatable(codeLines)
 
     override fun getTransformedCode(): List<String> {
         var result = codeLines
-        statementList = getEliminatable(codeLines)
 
         for (c in statementList) {
             //делаем один - мёрджим делаем один - мёрджим
@@ -32,42 +32,30 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
                 result.removeAt(i--)
             }
             result.addAll(c.from, c.body)
-//
-//            val shift = (c.to - c.from)
-//            var i = c.to + shift - 1
-//            while (i >= c.from + shift) {
-//                result.removeAt(i--)
-//            }
         }
 
         return result
     }
 
     private fun transform(startLine: Int, endLine: Int, codeLines: List<String>): List<CodeToMerge> {
-        val continueList = getOperatorList(startLine, endLine, codeLines)
+        val breakList = getOperatorList(startLine, endLine, codeLines)
         val transformedBody = mutableListOf<CodeToMerge>()
 
-        for (c in continueList) {
+        for (c in breakList) {
             transformedBody.add(mergeBody(c))
         }
 
         return transformedBody
     }
 
-    private fun mergeBody(statement: ContinueTransformedStatement): CodeToMerge {
+    private fun mergeBody(statement: BreakTransformedStatement): CodeToMerge {
         val result = mutableListOf<String>()
-//        if (statement.conditionBody.size <= 2) {
-//            val condition = RegexHelper.getConditionFromStatement(statement.conditionBody.first())
-//        } else {
-        result.addAll(statement.conditionBody)
-        val last = result.removeLast()
-        result.add("$last else {")
 
-        statement.afterConditionBody.forEach {
-            result.add("\t$it")
-        }
-        result.add(last)
-        //}
+        result.add("do {")
+        result.add("if(!(${statement.loopCondition})) {")
+        result.addAll(statement.body)
+        result.add("}")
+        result.add("} while (${statement.loopCondition} && !(${statement.innerCondition}))")
 
         return CodeToMerge(statement.openBodyLine, statement.oldBodyEndLine, result)
     }
@@ -77,39 +65,46 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
         startLine: Int,
         endLine: Int,
         codeLines: List<String>
-    ): List<ContinueTransformedStatement> {
-        val lines = mutableListOf<ContinueTransformedStatement>()
+    ): List<BreakTransformedStatement> {
+        val lines = mutableListOf<BreakTransformedStatement>()
         val nesting = NestingHelpers.getNesting(codeLines, startLine)
 
+        //нужно идти до ближайшего цикла и менять его в do-while
         var i = startLine
+        var loopLine = -1
         while (i < endLine) {
+            //for, do
+            var condition = ""
+            if (codeLines[i].contains("while")) {
+                loopLine = i
+            }
             if (codeLines[i].contains(operator)) {
                 //if может быть на несколько строк или { начинаться с новой строки
-                val firstNesting = NestingHelpers.getMyNesting(i, nesting)
-                var j = firstNesting.openNestingLine
-                val conditionBody = mutableListOf<String>()
-                var metOperator = false
-                while (j <= firstNesting.closeNestingLine) {
-                    if ((codeLines[j].contains(operator) || metOperator) && !codeLines[j].contains("}")) {
-                        metOperator = true
+                var j = loopLine + 1
+                val firstNesting = NestingHelpers.getMyNesting(j, nesting)
+                val body = mutableListOf<String>()
+                while (j < firstNesting.closeNestingLine) {
+                    if (codeLines[j].contains(operator)) {
                         j++
                         continue
                     }
-                    conditionBody.add(codeLines[j])
-                    j++
-                }
-                val secondNesting = NestingHelpers.getMyNesting(j, nesting)
-                val body = mutableListOf<String>()
-                while (j < secondNesting.closeNestingLine) {
+                    if ((NestingHelpers.getMyNesting(j + 1, nesting).nesting > firstNesting.nesting)
+                        && condition.isEmpty()
+                    ) {
+                        condition = RegexHelper.getConditionFromStatement(codeLines[j])
+                    }
                     body.add(codeLines[j])
                     j++
                 }
+                body.add(codeLines[j])
+
                 lines.add(
-                    ContinueTransformedStatement(
-                        conditionBody,
+                    BreakTransformedStatement(
+                        RegexHelper.getConditionFromStatement(codeLines[loopLine]),
+                        condition,
                         body,
                         firstNesting.openNestingLine,
-                        j - 1
+                        j
                     )
                 )
                 i = j

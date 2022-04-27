@@ -5,6 +5,8 @@ object RegexHelper {
     private val declarationMethodPattern = "\\s\\w*\\(.*\\{$".toRegex()
     private val nameMethodPattern = "\\s\\w*\\(".toRegex()
     private val methodArgumentsPattern = "\\(.*\\)".toRegex()
+    private val ifConditionPattern = "if\\s*\\(.*\\)".toRegex()
+    private val whileConditionPattern = "while\\s*\\(.*\\)".toRegex()
 
     fun getMetodName(s: String): String? {
         val nameFromPattern = nameMethodPattern.find(s)?.value
@@ -37,6 +39,16 @@ object RegexHelper {
         InputOutput.printList(args)
 
         return args
+    }
+
+    fun getConditionFromStatement(s: String): String {
+        if (!ifConditionPattern.containsMatchIn(s) && !whileConditionPattern.containsMatchIn(s))
+            throw IllegalArgumentException()
+
+        val start = s.indexOfFirst { it == '(' } + 1
+        val end = s.indexOfLast { it == ')' }
+
+        return s.substring(start, end)
     }
 
     fun containMethodDeclaration(s: String): Boolean {

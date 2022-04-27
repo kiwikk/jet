@@ -2,6 +2,7 @@ package helpers.parsers
 
 import NestingLine
 import OpenClosedNesting
+import helpers.InputOutput
 
 object NestingHelpers {
     /**
@@ -12,10 +13,13 @@ object NestingHelpers {
     fun getNesting(codeLines: List<String>, startLine:Int): List<OpenClosedNesting> {
         val stack = ArrayDeque<NestingLine>()
         val nestingList = mutableListOf<OpenClosedNesting>()
+        println("Line: $startLine")
+        codeLines.forEachIndexed { index, s ->  println("$index $s")}
 
         var i = startLine
         var depth = 0
         do {
+            println("on line: $i")
             if (codeLines[i].contains("{")) {
                 val nesting = NestingLine(depth++, i)
                 stack.addLast(nesting)
@@ -38,7 +42,7 @@ object NestingHelpers {
      * @return nesting of input line
      * */
     fun getMyNesting(line: Int, openClosedNestingList: List<OpenClosedNesting>): OpenClosedNesting {
-        val openBrackets = openClosedNestingList.filter { it.closeNestingLine > line }
+        val openBrackets = openClosedNestingList.filter { it.closeNestingLine > line && it.openNestingLine < line }
         val tmp = openBrackets.map { it to ((line - it.openNestingLine) + (it.closeNestingLine - line))/2 }
         val res = tmp.minByOrNull { it.second }
         return res!!.first

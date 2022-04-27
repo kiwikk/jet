@@ -2,5 +2,6 @@ package helpers
 
 enum class Statements(val operator:String) {
     RETURN("return"),
-    CONTINUE("continue")
+    CONTINUE("continue"),
+    BREAK("break")
 }
