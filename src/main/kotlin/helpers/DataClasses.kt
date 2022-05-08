@@ -43,9 +43,17 @@ data class ContinueTransformedStatement(
 data class BreakTransformedStatement(
     val loopCondition: String,
     val innerCondition: String,
-    val body: List<String>,
+    val body: BreakBody,
+    val nesting: Int,
     val openBodyLine: Int,
     val oldBodyEndLine: Int = -1
+)
+
+data class BreakBody(
+    val beforeOperatorBody: List<String>,
+    val conditionBody: List<String>,
+    val afterConditionBody: List<String>,
+    val loopRemainder: List<String>
 )
 
 data class CodeToMerge(val from: Int, val to: Int, val body: List<String>)

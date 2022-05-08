@@ -55,6 +55,8 @@ object RegexHelper {
         return declarationMethodPattern.containsMatchIn(s)
     }
 
+    fun isOperatorInLine(operator: String, line: String) = "\\s[^\\w*]$operator".toRegex().containsMatchIn(line)
+
     fun getMethodArgumentsFromKotlin(s: String): List<String> {
         val argsFromPattern = methodArgumentsPattern.find(s)?.let {
             val value = it.value

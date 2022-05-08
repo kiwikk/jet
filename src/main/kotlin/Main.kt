@@ -6,17 +6,11 @@
  * в дальнейшем будет доработано с заменой на while скорее всего
  * */
 
-import elimination.impl.BreakElimination
-import elimination.impl.ContinueElimination
+import elimination.impl.BreakTransformer
 import helpers.InputOutput.printList
 import helpers.InputOutput.readFileAsLines
-import helpers.MethodsLabels
-import helpers.RegexHelper
 import helpers.Statements
-import oldimpl.JumpState
-import oldimpl.JumpTransformation
 import java.io.File
-import kotlin.system.measureTimeMillis
 
 fun main() {
     /**
@@ -28,6 +22,10 @@ fun main() {
      * .cpp
      * etc
      * */
+
+    //statistic
+    //transformation
+    //statistic
     val fileName = "Test2.kt"
     val directory = "C:\\Users\\Mi\\Desktop\\tests\\$fileName"
     val list = readFileAsLines(directory)
@@ -38,7 +36,7 @@ fun main() {
 
 //    print(RegexHelper.getConditionFromStatement("if(a==b)"))
 
-    val cl = BreakElimination(list, Statements.BREAK.operator)
+    val cl = BreakTransformer(list, Statements.BREAK.operator)
     val transformed = cl.getTransformedCode()
 
     val outputDirectory = "C:\\Users\\Mi\\Desktop\\tests\\output\\output_$fileName"

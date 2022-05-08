@@ -2,14 +2,15 @@ package elimination.impl
 
 import CodeToMerge
 import ContinueTransformedStatement
-import elimination.StatementToEliminate
+import elimination.BaseTransformer
+import helpers.RegexHelper
 import helpers.parsers.NestingHelpers
 
-class ContinueElimination(private val codeLines: List<String>, private val operator: String) :
-    StatementToEliminate(operator) {
+class ContinueTransformer(private val operator: String, codeLines: List<String>) :
+    BaseTransformer(operator) {
     var statementList = getEliminatable(codeLines)
 
-    override fun getTransformedCode(): List<String> {
+    override fun getTransformedCode(codeLines: List<String>): List<String> {
         var result = codeLines
         statementList = getEliminatable(codeLines)
 
@@ -83,7 +84,7 @@ class ContinueElimination(private val codeLines: List<String>, private val opera
 
         var i = startLine
         while (i < endLine) {
-            if (codeLines[i].contains(operator)) {
+            if (RegexHelper.isOperatorInLine(operator, codeLines[i])) {
                 //if может быть на несколько строк или { начинаться с новой строки
                 val firstNesting = NestingHelpers.getMyNesting(i, nesting)
                 var j = firstNesting.openNestingLine

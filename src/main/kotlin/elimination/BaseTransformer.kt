@@ -7,7 +7,7 @@ import helpers.MethodsLabels
 /**
  * basic functions of each eliminated operator
  * */
-abstract class StatementToEliminate(private val operator: String) {
+abstract class BaseTransformer(private val operator: String) {
     open fun getEliminatable(codeLines: List<String>): List<OperatorInMethod> {
         val methods = MethodsLabels.getMethodsWithOperator(codeLines, operator)
         val eliminatable = mutableListOf<OperatorInMethod>()
@@ -34,5 +34,5 @@ abstract class StatementToEliminate(private val operator: String) {
         return op
     }
 
-    abstract fun getTransformedCode(): List<String>
+    abstract fun getTransformedCode(codeLines: List<String>): List<String>
 }
