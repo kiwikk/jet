@@ -1,7 +1,6 @@
 package helpers
 
-enum class Statements(val operator:String) {
-    RETURN("return"),
+enum class Statements(val operatorName:String) {
     CONTINUE("continue"),
     BREAK("break"),
     GOTO("goto")

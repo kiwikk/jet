@@ -6,7 +6,8 @@
  * в дальнейшем будет доработано с заменой на while скорее всего
  * */
 
-import elimination.impl.BreakTransformer
+import elimination.impl.BreakTransformer0
+import elimination.impl.Transformer
 import helpers.InputOutput.printList
 import helpers.InputOutput.readFileAsLines
 import helpers.Statements
@@ -35,9 +36,8 @@ fun main() {
 //    val transformed = cl.getTransformedCode()
 
 //    print(RegexHelper.getConditionFromStatement("if(a==b)"))
-
-    val cl = BreakTransformer(list, Statements.BREAK.operator)
-    val transformed = cl.getTransformedCode()
+    val transformer = Transformer(list, Statements.values().toList())
+    val transformed = transformer.transform()
 
     val outputDirectory = "C:\\Users\\Mi\\Desktop\\tests\\output\\output_$fileName"
     File(outputDirectory).printWriter().use { out ->

@@ -61,7 +61,7 @@ class JumpState(val codeLines: List<String>) {
                 // добавляем строку входа и вложенность на которой она находится, чтобы потом по ней разворачивать ретёрн
                 // надо ли тогда запоминать на какой строке лежит ретёрн? скорее да чем нет
             }
-            if (codeLines[i].contains(statement.operator)) {
+            if (codeLines[i].contains(statement.operatorName)) {
                 methodStack.removeLast()
                 operatorStatesList.add(
                     OperatorState(
@@ -82,14 +82,14 @@ class JumpState(val codeLines: List<String>) {
 
     private fun getGotoList(list: List<String>): List<Int> {
         val statements = mutableListOf<Int>()
-        //from zero
-        list.forEachIndexed { index, s ->
-            if (s.contains(Statements.RETURN.operator))
-                statements.add(index)
-        }
-        printDivider()
-        println("Operator ${Statements.RETURN.operator} was found at the lines:")
-        printList(statements)
+//        //from zero
+//        list.forEachIndexed { index, s ->
+//            if (s.contains(Statements.RETURN.operator))
+//                statements.add(index)
+//        }
+//        printDivider()
+//        println("Operator ${Statements.RETURN.operator} was found at the lines:")
+//        printList(statements)
         return statements
     }
 }

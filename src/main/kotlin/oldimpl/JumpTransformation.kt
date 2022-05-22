@@ -129,12 +129,12 @@ class JumpTransformation(private val codelines: List<String>, private val jumpSt
         var i = methodDeclarations[methodEntry] ?: throw NoSuchMethodException()
 
         i++
-        while (!codelines[i].contains(statement.operator)) {
+        while (!codelines[i].contains(statement.operatorName)) {
             body.add(codelines[i])
             i++
         }
 
-        val returnValue = codelines[i].split(statement.operator)[1]
+        val returnValue = codelines[i].split(statement.operatorName)[1]
         return MethodBody(body, returnValue)
     }
 }

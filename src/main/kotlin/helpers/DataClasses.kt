@@ -31,7 +31,7 @@ data class OpenClosedNesting(val nesting: Int, val openNestingLine: Int, val clo
  * */
 data class MethodOpenCloseBracket(val methodName: String, var startLine: Int, var endLine: Int = -1)
 
-data class OperatorInMethod(var line: Int, val method: MethodOpenCloseBracket)
+data class OperatorInMethod(val operator: Statements, var line: Int, val method: MethodOpenCloseBracket)
 
 data class ContinueTransformedStatement(
     val conditionBody: List<String>,
@@ -40,13 +40,19 @@ data class ContinueTransformedStatement(
     val oldBodyEndLine: Int = -1
 )
 
+//data class BreakTransformedStatement(
+//    val loopCondition: String,
+//    val innerCondition: String,
+//    val body: BreakBody,
+//    val nesting: Int,
+//    val openBodyLine: Int,
+//    val oldBodyEndLine: Int = -1
+//)
+
 data class BreakTransformedStatement(
     val loopCondition: String,
-    val innerCondition: String,
-    val body: BreakBody,
-    val nesting: Int,
-    val openBodyLine: Int,
-    val oldBodyEndLine: Int = -1
+    val loopLine: Int,
+    val breakLine: Int,
 )
 
 data class BreakBody(

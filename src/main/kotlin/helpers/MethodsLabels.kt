@@ -2,6 +2,7 @@ package helpers
 
 import helpers.InputOutput.printList
 import MethodOpenCloseBracket
+import OperatorInMethod
 import helpers.InputOutput.printDivider
 import helpers.InputOutput.printMap
 import helpers.parsers.NestingHelpers
@@ -66,6 +67,24 @@ object MethodsLabels {
             var i = method.startLine
             while (i < method.endLine) {
                 if (codeLines[i].contains(operator)) {
+                    methodsWithOperators.add(method)
+                    break
+                }
+                i++
+            }
+        }
+
+        return methodsWithOperators
+    }
+
+    fun getMethodsWithOperators(codeLines: List<String>, operators: List<Statements>): List<MethodOpenCloseBracket> {
+        val methods = getMethodsDeclarationsList(codeLines)
+        val methodsWithOperators = mutableListOf<MethodOpenCloseBracket>()
+
+        for (method in methods) {
+            var i = method.startLine
+            while (i < method.endLine) {
+                if (operators.any { codeLines[i].contains(it.operatorName) }) {
                     methodsWithOperators.add(method)
                     break
                 }
