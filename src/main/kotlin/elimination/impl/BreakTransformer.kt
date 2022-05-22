@@ -54,7 +54,6 @@ class BreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTra
             result.add(breakVerification[0])
 
             var j = i
-
             while (j < myNesting.closeNestingLine) {
                 result.add("\t${codeLines[j++]}")
             }
