@@ -1,11 +1,7 @@
-package elimination.impl
+package transformation.impl
 
-import BreakBody
-import BreakTransformedStatement
 import CodeToMerge
-import elimination.BaseTransformer
-import helpers.RegexHelper
-import helpers.parsers.NestingHelpers
+import transformation.BaseTransformer
 
 class BreakTransformer0(private val operator: String, codeLines: List<String>) : BaseTransformer() {
     override fun getTransformedCode(codeLines: List<String>): List<CodeToMerge> {

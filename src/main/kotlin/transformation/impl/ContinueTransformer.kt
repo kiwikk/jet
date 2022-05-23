@@ -1,9 +1,9 @@
-package elimination.impl
+package transformation.impl
 
 import CodeToMerge
 import ContinueTransformedStatement
 import OperatorInMethod
-import elimination.BaseTransformer
+import transformation.BaseTransformer
 import helpers.RegexHelper
 import helpers.parsers.NestingHelpers
 

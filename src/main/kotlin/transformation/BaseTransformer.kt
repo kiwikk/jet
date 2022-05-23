@@ -1,9 +1,6 @@
-package elimination
+package transformation
 
 import CodeToMerge
-import OperatorInMethod
-import MethodOpenCloseBracket
-import helpers.MethodsLabels
 
 /**
  * basic functions of each eliminated operator

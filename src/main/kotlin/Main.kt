@@ -6,11 +6,12 @@
  * в дальнейшем будет доработано с заменой на while скорее всего
  * */
 
-import elimination.impl.BreakTransformer0
-import elimination.impl.Transformer
+import transformation.impl.Transformer
 import helpers.InputOutput.printList
 import helpers.InputOutput.readFileAsLines
+import helpers.RegexHelper
 import helpers.Statements
+import helpers.parsers.NestingHelpers
 import java.io.File
 
 fun main() {
@@ -32,10 +33,16 @@ fun main() {
     val list = readFileAsLines(directory)
     printList(list)
 
+//    val nesting = NestingHelpers.getNesting(list, 0)
+//    list.forEachIndexed { index, s ->
+//        if (index != 0)
+//            println("${NestingHelpers.getMyNesting(index, nesting).nesting} $s")
+//    }
+
 //    val cl = ContinueElimination(list, Statements.CONTINUE.operator)
 //    val transformed = cl.getTransformedCode()
 
-//    print(RegexHelper.getConditionFromStatement("if(a==b)"))
+  //  print(RegexHelper.getConditionFromStatement("if(a==b)"))
     val transformer = Transformer(list, Statements.values().toList())
     val transformed = transformer.transform()
 

@@ -1,7 +1,6 @@
-package elimination
+package transformation
 
 import OperatorInMethod
-import elimination.impl.*
 import helpers.Statements
 import helpers.StatementsHelper.getStatements
 

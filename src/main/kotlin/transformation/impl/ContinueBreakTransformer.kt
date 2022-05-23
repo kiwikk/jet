@@ -1,14 +1,17 @@
-package elimination.impl
+package transformation.impl
 
 import BreakTransformedStatement
 import CodeToMerge
+import NestingLine
 import OperatorInMethod
-import elimination.BaseTransformer
+import transformation.BaseTransformer
 import helpers.RegexHelper
+import helpers.Statements
+import helpers.StatementsHelper.getFlagName
 import helpers.parsers.NestingHelpers.getMyNesting
 import helpers.parsers.NestingHelpers.getNesting
 
-class BreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTransformer() {
+class ContinueBreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTransformer() {
     override fun getTransformedCode(codeLines: List<String>): List<CodeToMerge> {
         val breakBody =
             getStatementBody(operatorInMethod.method.startLine, operatorInMethod.method.endLine, codeLines)
@@ -26,12 +29,16 @@ class BreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTra
         val nesting = getNesting(codeLines, 0)
 
         var myNesting = getMyNesting(statement.loopLine - 1, nesting)
-        val flagName = "breakEliminationFlag"
+        val flagName = getFlagName(operatorInMethod.operator)
         val newCondition = "${"\t".repeat(myNesting.nesting + 1)}var $flagName = ${statement.loopCondition}"
         val newLoop =
             "${"\t".repeat(myNesting.nesting + 1)}while($flagName) {" //todo сделать более гибким для do while, for(?)
-        val breakCondition =
-            "${"\t".repeat(myNesting.nesting + 2)}$flagName = $flagName && (${statement.loopCondition})"
+
+        val breakCondition = when (operatorInMethod.operator) {
+            Statements.BREAK -> "${"\t".repeat(myNesting.nesting + 2)}$flagName = $flagName && (${statement.loopCondition})"
+            else -> "${"\t".repeat(myNesting.nesting + 2)}$flagName = (${statement.loopCondition})"
+        }
+
 
         var i = statement.loopLine
         result.add(newCondition)
@@ -43,9 +50,12 @@ class BreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTra
         myNesting = getMyNesting(i, nesting)
         val breakReplacement = "${"\t".repeat(myNesting.nesting + 1)}$flagName = false"
         result.add(breakReplacement)
-        i = getMyNesting(i, nesting).closeNestingLine
+        i = myNesting.closeNestingLine
         result.add(codeLines[i++])
         val loopEnd = getMyNesting(statement.loopLine + 1, nesting).closeNestingLine
+        if (i == loopEnd) {
+            result.add(codeLines[i])
+        }
         while (i < loopEnd) {
             myNesting = getMyNesting(i, nesting)
 
@@ -65,9 +75,8 @@ class BreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTra
         val tmp = result.removeLast()
         result.add(breakCondition)
         result.add(tmp)
-        result.add(codeLines[i])
 
-        return CodeToMerge(statement.loopLine, i, result)
+        return CodeToMerge(statement.loopLine, loopEnd, result)
     }
 
 
@@ -76,15 +85,22 @@ class BreakTransformer(private val operatorInMethod: OperatorInMethod) : BaseTra
         endLine: Int,
         codeLines: List<String>
     ): BreakTransformedStatement? {
+        val nesting = getNesting(codeLines, startLine)
         var i = startLine
-        var loopLine = -1
+        val loopLine = ArrayDeque<Int>()
         while (i < endLine) {
             if (codeLines[i].contains("while")) {
-                loopLine = i
+                loopLine.add(i)
             }
-            if (codeLines[i].contains(operatorInMethod.operator.operatorName)) {
-                val condition = RegexHelper.getConditionFromStatement(codeLines[loopLine])
-                return BreakTransformedStatement(condition, loopLine, i)
+            if (codeLines[i].contains("}")) {
+                if(getMyNesting(loopLine.last(), nesting) == getMyNesting(i, nesting)) {
+                    loopLine.removeLast()
+                }
+            }
+            val regex = "\\s[^\\w*]${operatorInMethod.operator.operatorName}(;*)\$".toRegex()
+            if (regex.containsMatchIn(codeLines[i])) {
+                val condition = RegexHelper.getConditionFromStatement(codeLines[loopLine.last()])
+                return BreakTransformedStatement(condition, loopLine.last(), i)
             }
             i++
         }

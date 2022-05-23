@@ -7,11 +7,13 @@ import helpers.InputOutput.printDivider
 import helpers.InputOutput.printMap
 import helpers.parsers.NestingHelpers
 import keywords.KeyWords
+import transformation.impl.Transformer.Companion.OPERATOR_ID
 
 object MethodsLabels {
     private val methodPattern = "\\s\\w*\\(.*[^{]\$".toRegex()
     private val declarationMethodPattern = "\\s\\w*\\(.*\\{$".toRegex()
     private val nameMethodPattern = "\\s\\w*\\(".toRegex()
+    private val signaturePattern = "\\(.*\\)".toRegex()
 
     fun getMethodsDeclarations(codeLines: List<String>): HashMap<String, Int> {
         val methodDeclaration = hashMapOf<String, Int>()
@@ -98,20 +100,21 @@ object MethodsLabels {
     fun getMethodsCalls(codeLines: List<String>): List<MethodOpenCloseBracket> {
         val methodCalls = mutableListOf<MethodOpenCloseBracket>()
 
-        codeLines.forEachIndexed { index, s ->
-            if (methodPattern.containsMatchIn(s)) {
-                val nameFromPattern = nameMethodPattern.find(s)?.value
-                if (!nameFromPattern.isNullOrEmpty()) {
-                    val name = nameFromPattern.subSequence(1, nameFromPattern.length - 1).toString()
-                    methodCalls.add(
-                        MethodOpenCloseBracket(
-                            methodName = name,
-                            startLine = index
-                        )
-                    )
-                }
-            }
-        }
+//        codeLines.forEachIndexed { index, s ->
+//            if (methodPattern.containsMatchIn(s)) {
+//                val nameFromPattern = nameMethodPattern.find(s)?.value
+//                val signatureFromPattern
+//                if (!nameFromPattern.isNullOrEmpty()) {
+//                    val name = nameFromPattern.subSequence(1, nameFromPattern.length - 1).toString()
+//                    methodCalls.add(
+//                        MethodOpenCloseBracket(
+//                            methodName = name,
+//                            startLine = index
+//                        )
+//                    )
+//                }
+//            }
+//        }
 
         printDivider()
         println("Methods calls:")

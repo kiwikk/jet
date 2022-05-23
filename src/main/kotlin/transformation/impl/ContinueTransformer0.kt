@@ -1,10 +1,7 @@
-package elimination.impl
+package transformation.impl
 
 import CodeToMerge
-import ContinueTransformedStatement
-import elimination.BaseTransformer
-import helpers.RegexHelper
-import helpers.parsers.NestingHelpers
+import transformation.BaseTransformer
 
 class ContinueTransformer0(private val operator: String, codeLines: List<String>) :
     BaseTransformer() {

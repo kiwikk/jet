@@ -2,18 +2,22 @@ package helpers
 
 import MethodOpenCloseBracket
 import OperatorInMethod
+import transformation.impl.Transformer.Companion.OPERATOR_ID
 
 object StatementsHelper {
+    private val gotoLabelPattern = "goto\\s*\\w*".toRegex()
+    private val labelPattern = "^\\s*\\w*[^;{}()]".toRegex()
+
     fun getStatements(codeLines: List<String>, operators: List<Statements>): List<OperatorInMethod> {
         val methods = MethodsLabels.getMethodsWithOperators(codeLines, operators)
-        val operatorsInMehod = mutableListOf<OperatorInMethod>()
+        val operatorsInMethod = mutableListOf<OperatorInMethod>()
 
-        for(m in methods){
+        for (m in methods) {
             val op = getOperatorsFromMethod(m, codeLines, operators)
-            operatorsInMehod.addAll(op)
+            operatorsInMethod.addAll(op)
         }
 
-        return operatorsInMehod
+        return operatorsInMethod
     }
 
     fun getOperatorsFromMethod(
@@ -25,14 +29,32 @@ object StatementsHelper {
         var i = method.startLine
         while (i < method.endLine) {
             for (operator in operators) {
-                if ("\\s[^\\w*]${operator.operatorName}".toRegex().containsMatchIn(codeLines[i])) {
-                    op.add(OperatorInMethod(operator, i, method))
+                val regex = "\\s[^\\w*]${operator.operatorName}(;*)\$".toRegex()
+                if (regex.containsMatchIn(codeLines[i])) {
+                    op.add(OperatorInMethod(OPERATOR_ID++, operator, i, method))
                     continue
                 }
             }
             i++
         }
+        OPERATOR_ID = 0
 
         return op
+    }
+
+    fun getLabel(codeLines: List<String>, operatorLine: Int): String {
+        return if(codeLines[operatorLine].contains(gotoLabelPattern)){
+            codeLines[operatorLine].split(" ")[1].apply {
+                labelPattern.find(this)?.value
+            }
+
+        } else ""
+    }
+
+    fun getFlagName(statement: Statements): String{
+        val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
+        return statement.operatorName + "_" + (1..10)
+            .map { allowedChars.random() }
+            .joinToString("")
     }
 }
