@@ -1,10 +1,11 @@
 package transformation.impl
 
 import CodeToMerge
-import transformation.BaseTransformer
-import transformation.impl.gototransformation.GotoTransformer
-import helpers.Statements
+import helpers.ReplacementStatementsHelper
+import transformation.ITransformer
+import statements.Statements
 import helpers.StatementsHelper.getStatements
+import transformation.impl.gototransformation.UnknownType
 
 class Transformer(private val codeLines: List<String>, private val operators: List<Statements>) {
     private var statementsLinks = getStatements(codeLines, operators)
@@ -15,15 +16,25 @@ class Transformer(private val codeLines: List<String>, private val operators: Li
         while (statementsLinks.isNotEmpty()) {
             statementsLinks = getStatements(result, operators)
             for (op in statementsLinks) {
-                val transformer: BaseTransformer = when (op.operator) {
-                    Statements.GOTO -> GotoTransformer(op)
+                val transformer: ITransformer = when (op.operator) {
+                    Statements.GOTO.operatorName -> GotoTransformer(op)
                     else -> ContinueBreakTransformer(op)
                 }
 
-                val transformations = transformer.getTransformedCode(result)
+                val transformations = try {
+                    transformer.getTransformedCode(result)
+                } catch (ex: Exception) {
+                    UnknownType.transform(result, op)
+                }
+
                 result = merge(transformations, result)
                 updateLinks(result)
             }
+        }
+
+        val replacements = ReplacementStatementsHelper.getStatements(result)
+        for (r in replacements) {
+            result = merge(UnknownType.deTransform(result, r), result)
         }
 
         return result

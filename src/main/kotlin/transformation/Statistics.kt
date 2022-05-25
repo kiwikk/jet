@@ -1,7 +1,7 @@
 package transformation
 
 import OperatorInMethod
-import helpers.Statements
+import statements.Statements
 import helpers.StatementsHelper.getStatements
 
 object Statistics {

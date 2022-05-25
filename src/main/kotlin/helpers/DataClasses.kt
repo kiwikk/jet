@@ -1,15 +1,4 @@
-import helpers.Statements
-
-
-data class OperatorState(val className: String, val inputLine: Int, val callingMethod: Method, val operator: Statements)
-
-data class MethodBody(val body: List<String>, val returnValue: String?)
-
-data class Method(val methodName: String, val invokationLine: Int)
-
-data class Elimination(val operator: Statements, val line: Int, val nesting: Int, val unwrappingLine: Int)
-
-data class Conditional(val conditional: String)
+import statements.Statements
 
 /**
  * @param nesting nesting depth
@@ -31,39 +20,55 @@ data class OpenClosedNesting(val nesting: Int, val openNestingLine: Int, val clo
  * */
 data class MethodOpenCloseBracket(val methodName: String, var startLine: Int, var endLine: Int = -1)
 
-data class OperatorInMethod(val id: Int, val operator: Statements, var line: Int, var method: MethodOpenCloseBracket)
+/**
+ * @param id operator id in method
+ * @param operator processed operator
+ * @param line operator line
+ * @param method method that keeps processed operator
+ * */
+data class OperatorInMethod(val id: Int, val operator: String, var line: Int, var method: MethodOpenCloseBracket)
 
-data class ContinueTransformedStatement(
-    val conditionBody: List<String>,
-    val afterConditionBody: List<String>,
-    val openBodyLine: Int,
-    val oldBodyEndLine: Int = -1
+/**
+ * @param id operator id in method
+ * @param operator processed operator
+ * @param line operator line
+ * @param method method that keeps processed operator
+ * @param label goto label (point of going to)
+ * */
+data class GotoInMethod(
+    val id: Int,
+    val operator: String,
+    var line: Int,
+    val label: Label,
+    var method: MethodOpenCloseBracket
 )
 
-//data class BreakTransformedStatement(
-//    val loopCondition: String,
-//    val innerCondition: String,
-//    val body: BreakBody,
-//    val nesting: Int,
-//    val openBodyLine: Int,
-//    val oldBodyEndLine: Int = -1
-//)
+/**
+ * @param name label name
+ * @param line label line
+ * */
+data class Label(val name: String, val line: Int)
 
-data class BreakTransformedStatement(
+/**
+ * @param loopCondition condition of operator
+ * @param loopLine line of operator's loop
+ * @param statementLine line of operator
+ * */
+data class ProcessedStatement(
     val loopCondition: String,
     val loopLine: Int,
-    val breakLine: Int,
+    val statementLine: Int,
 )
 
-data class BreakBody(
-    val beforeOperatorBody: List<String>,
-    val conditionBody: List<String>,
-    val afterConditionBody: List<String>,
-    val loopRemainder: List<String>
+data class ProcessedGoto(
+    val label: Label,
+    val lineFrom: Int,
+    val lineTo: Int,
+    val gotoLine: String
 )
+
+data class Loop(val startOfLoop: String, val endOfLoop: String)
 
 data class CodeToMerge(val from: Int, val to: Int, val body: List<String>)
-
-data class BodyLine(val line: Int, val body: List<String>)
 
 

@@ -2,6 +2,8 @@ package helpers
 
 import MethodOpenCloseBracket
 import OperatorInMethod
+import language.LanguageHelper.LAN
+import statements.Statements
 import transformation.impl.Transformer.Companion.OPERATOR_ID
 
 object StatementsHelper {
@@ -9,7 +11,7 @@ object StatementsHelper {
     private val labelPattern = "^\\s*\\w*[^;{}()]".toRegex()
 
     fun getStatements(codeLines: List<String>, operators: List<Statements>): List<OperatorInMethod> {
-        val methods = MethodsLabels.getMethodsWithOperators(codeLines, operators)
+        val methods = MethodsHelper.getMethodsWithOperators(codeLines, operators.map { it.operatorName })
         val operatorsInMethod = mutableListOf<OperatorInMethod>()
 
         for (m in methods) {
@@ -29,9 +31,12 @@ object StatementsHelper {
         var i = method.startLine
         while (i < method.endLine) {
             for (operator in operators) {
-                val regex = "\\s[^\\w*]${operator.operatorName}(;*)\$".toRegex()
+                var regex = "\\s[^\\w*]${operator.operatorName}(;*)\$".toRegex()
+                if (operator == Statements.GOTO) {
+                    regex = "\\s[^\\w*]${operator.operatorName}".toRegex()
+                }
                 if (regex.containsMatchIn(codeLines[i])) {
-                    op.add(OperatorInMethod(OPERATOR_ID++, operator, i, method))
+                    op.add(OperatorInMethod(OPERATOR_ID++, operator.operatorName, i, method))
                     continue
                 }
             }
@@ -42,19 +47,29 @@ object StatementsHelper {
         return op
     }
 
-    fun getLabel(codeLines: List<String>, operatorLine: Int): String {
-        return if(codeLines[operatorLine].contains(gotoLabelPattern)){
-            codeLines[operatorLine].split(" ")[1].apply {
+    fun getLabel(line: String): String {
+        return if (line.contains(gotoLabelPattern)) {
+            val i = line.indexOfFirst { it.isLetter() }
+            line.substring(i).split(" ")[1].apply {
                 labelPattern.find(this)?.value
-            }
+            }.replace(LAN.semicolon, "")
 
         } else ""
     }
 
-    fun getFlagName(statement: Statements): String{
+    fun getGotoStatement(line: String): String {
+        val i = line.indexOfFirst { it.isLetter() }
+        return line.substring(i)
+    }
+
+    fun getFlagName(statement: String): String {
         val allowedChars = ('A'..'Z') + ('a'..'z') + ('0'..'9')
-        return statement.operatorName + "_" + (1..10)
+        return statement + "_" + (1..10)
             .map { allowedChars.random() }
             .joinToString("")
+    }
+
+    fun getLabelNameFromCodeLine(codeLine: String): String {
+        return codeLine.filter { it.isLetter() }.replace(LAN.semicolon, "")
     }
 }

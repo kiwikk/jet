@@ -4,6 +4,5 @@ enum class GotoType {
     LOOP,
     BREAK,
     SKIP,
-    SWITCH,
     UNKNOWN
 }
