@@ -24,7 +24,7 @@ object LanguageHelper {
             while (i < codeLines.size) {
                 if (codeLines[i].contains("{")) {
                     val tmp =
-                        result.removeLast() + " " + codeLines[i].substring(codeLines[i].indexOfFirst { it.isLetter() })
+                        result.removeLast() + " " + codeLines[i].substring(codeLines[i].indexOfFirst { !it.isWhitespace() })
                     result.add(tmp)
                     i++
                 } else {
@@ -42,11 +42,12 @@ object LanguageHelper {
             val nesting = getNesting(codeLines, 0)
             var i = 0
             while (i < codeLines.size) {
-                if (codeLines[i].contains("{")) {
+                if (codeLines[i].contains("{") && !codeLines[i].all { it.isLetter() }) {
                     val index = codeLines[i].indexOfFirst { it == '{' }
                     val tmp = codeLines[i].substring(0, index) + "\n${"\t".repeat(getMyNesting(i, nesting).nesting)}" +
                             codeLines[i].substring(index)
                     result.add(tmp)
+                    i++
                 } else {
                     result.add(codeLines[i++])
                 }

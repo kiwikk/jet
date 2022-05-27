@@ -15,6 +15,7 @@ object NestingHelpers {
         val nestingList = mutableListOf<OpenClosedNesting>()
         println("Line: $startLine")
         codeLines.forEachIndexed { index, s -> println("$index $s") }
+        var firstBracket = false
 
         try {
             var i = startLine
@@ -24,6 +25,7 @@ object NestingHelpers {
                 if (codeLines[i].contains("{")) {
                     val nesting = NestingLine(depth++, i)
                     stack.addLast(nesting)
+                    firstBracket = true
                 }
                 if (codeLines[i].contains("}")) {
                     val nesting = stack.removeLast()
@@ -31,7 +33,7 @@ object NestingHelpers {
                     depth--
                 }
                 i++
-            } while (!stack.isEmpty())
+            } while (!stack.isEmpty() || !firstBracket)
         } catch (e: IndexOutOfBoundsException) {
             print("Wrong bracket balance")
         }
@@ -50,7 +52,7 @@ object NestingHelpers {
             val openBrackets = openClosedNestingList.filter { it.closeNestingLine > line && it.openNestingLine < line }
             val tmp = openBrackets.map { it to ((line - it.openNestingLine) + (it.closeNestingLine - line)) / 2 }
             val res = tmp.minByOrNull { it.second }
-            return res!!.first
+            return res?.first ?: openClosedNestingList.find { it.nesting == 0 }!!
 //        } catch (ex: NullPointerException) {
 //            print("Wrong bracket balance in getMyNesting")
 //        }

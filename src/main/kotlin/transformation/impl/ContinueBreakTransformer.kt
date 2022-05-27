@@ -26,7 +26,7 @@ class ContinueBreakTransformer(private val operatorInMethod: OperatorInMethod) :
 
     private fun mergeBody(statement: ProcessedStatement, codeLines: List<String>): CodeToMerge {
         val result = mutableListOf<String>()
-        val nesting = getNesting(codeLines, 0)
+        val nesting = getNesting(codeLines, operatorInMethod.method.startLine)
 
         var myNesting = getMyNesting(statement.loopLine - 1, nesting)
         val flagName = getFlagName(operatorInMethod.operator)
