@@ -13,8 +13,8 @@ object NestingHelpers {
 
         val stack = ArrayDeque<NestingLine>()
         val nestingList = mutableListOf<OpenClosedNesting>()
-        println("Line: $startLine")
-        codeLines.forEachIndexed { index, s -> println("$index $s") }
+       // println("Line: $startLine")
+        //codeLines.forEachIndexed { index, s -> println("$index $s") }
         var firstBracket = false
 
         try {

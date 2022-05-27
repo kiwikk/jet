@@ -3,6 +3,13 @@ plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.4.31'
 }
 
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "MainKt"
+    }
+    from { configurations.compileClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
 group 'org.example'
 version '1.0-SNAPSHOT'
 

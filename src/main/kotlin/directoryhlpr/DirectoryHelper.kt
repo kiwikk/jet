@@ -3,6 +3,7 @@ package directoryhlpr
 import DirectoryException
 import statements.Statements
 import language.LanguageHelper
+import transformation.Statistics
 import transformation.impl.Transformer
 import java.io.File
 
@@ -17,7 +18,7 @@ class DirectoryHelper(private val directory: String) {
     }
 
     private fun processDirectory() {
-        val files = File(directory).walk().forEach {
+        File(directory).walk().forEach {
             val fileName = getOutputDirectoryName(it.absolutePath)
             if(it.isFile && !fileName.contains(OUTPUT_FILE_PREFIX)) {
                 val lastSeparatorIndex = directory.lastIndexOf(File.separator) + 1
@@ -48,6 +49,7 @@ class DirectoryHelper(private val directory: String) {
         LanguageHelper.setLanguage(file.absolutePath)
         var codeLines = file.readLines()
 
+        Statistics.getOperatorStatistics(codeLines)
         codeLines = LanguageHelper.languagePreWork(codeLines)
 
         val transformer = Transformer(codeLines, Statements.values().toList())
@@ -59,6 +61,9 @@ class DirectoryHelper(private val directory: String) {
                 out.println(line)
             }
         }
+
+        Statistics.getOperatorStatistics(transformed)
+        Statistics.getDifference(codeLines, transformed)
     }
 
     private fun getOutputDirectoryName(directory: String): String {
