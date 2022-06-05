@@ -10,7 +10,5 @@ object InputOutput {
         println(it)
     }
 
-    fun printMap(map: HashMap<String, Int>) = map.forEach { (t, u) -> println("[$t -- $u]") }
-
     fun printDivider() = println("~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ")
 }

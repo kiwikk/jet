@@ -1,32 +1,31 @@
-import helpers.InputOutput.printList
-import helpers.InputOutput.readFileAsLines
-import helpers.Statements
-import impl.JumpState
-import impl.JumpTransformation
-import kotlin.system.measureTimeMillis
+/**
+ * ограничения на данный момент:
+ * вложенность должна чётко обозначаться {}
+ * то есть у ифов с однострочным телом должны быть {}
+ * for пока не обрабатывается из-за нетипичной структуры for в языке Kotlin
+ * в дальнейшем будет доработано с заменой на while скорее всего
+ * */
 
-fun main() {
-    /**
-     * берём имя файла
-     * сплитим по точке
-     * смотрим формат файла после точки -- определяем язык
-     * .py
-     * .kt
-     * .cpp
-     * etc
-     * */
-    val fileName = "C:\\Users\\Mi\\Desktop\\tests\\Test1.kt"
-    val list = readFileAsLines(fileName)
-    printList(list)
+import directoryhlpr.DirectoryHelper
 
-    val executionTime = measureTimeMillis {
-        val jumpStates = JumpState(list)
-        val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
+fun main(args: Array<String>) {
+    val directory = args.lastOrNull()
 
-        val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
-        jumpTransformation.getTransformedCode()
+    try {
+        val directoryHelper = DirectoryHelper(directory!!)
+        directoryHelper.process()
+    }catch (ex: Exception){
+        print(ex.message)
     }
 
-    println()
-    print("Execution time: $executionTime ms.")
+//    val executionTime = measureTimeMillis {
+//        val jumpStates = JumpState(list)
+//        val gotoList = jumpStates.getGotoLabelList(Statements.RETURN)
+//
+//        val jumpTransformation = JumpTransformation(codelines = list, jumpStates = gotoList)
+//        jumpTransformation.getTransformedCode()
+//    }
+//
+//    println()
+//    print("Execution time: $executionTime ms.")
 }
